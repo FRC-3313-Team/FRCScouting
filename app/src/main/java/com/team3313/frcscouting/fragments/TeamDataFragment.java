@@ -2,19 +2,17 @@ package com.team3313.frcscouting.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Space;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.team3313.frcscouting.DataStore;
 import com.team3313.frcscouting.MainActivity;
-import com.team3313.frcscouting.R;
 import com.team3313.frcscouting.components.TeamButtons;
 
 import org.json.JSONException;
@@ -28,6 +26,7 @@ import org.json.JSONObject;
 public class TeamDataFragment extends TeamFragment {
     private static final String ARG_TEAM_KEY = "frc3313";
     LinearLayout linearLayout;
+    TableLayout tableLayout;
 
 
     public TeamDataFragment() {
@@ -55,35 +54,12 @@ public class TeamDataFragment extends TeamFragment {
         if (getArguments() != null) {
             teamKey = getArguments().getString(ARG_TEAM_KEY);
         }
-        MainActivity.instance.setTitle("Team " + teamKey + ", " + DataStore.getTeamField(teamKey, "name") + " - Data");
+        MainActivity.instance.setTitle("Team " + teamKey.substring(3) + ", " + DataStore.getTeamField(teamKey, "name") + " - Data");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         DataStore.updateTeamStats(teamKey);
-        linearLayout = new LinearLayout(getContext());
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-
-        LinearLayout buttonRow = new TeamButtons(getContext(), this);
-        linearLayout.addView(buttonRow);
-
-        GridLayout gridLayout = new GridLayout(getActivity());
-        gridLayout.setRowCount(4);
-        gridLayout.setColumnCount(5);
-
-        GridLayout.LayoutParams defPars = new GridLayout.LayoutParams();
-        defPars.setGravity(Gravity.BOTTOM);
-
-        ImageView botImage = new ImageView(getContext());
-        botImage.setImageResource(R.drawable.ic_menu_camera);
-        GridLayout.LayoutParams params =
-                new GridLayout.LayoutParams();
-        params.rowSpec = GridLayout.spec(0, 2);
-        params.columnSpec = GridLayout.spec(0, 1);
-        params.setGravity(Gravity.BOTTOM);
-        botImage.setLayoutParams(params);
-        gridLayout.addView(botImage);
-
 
         JSONObject teamInfo = null;
         try {
@@ -91,95 +67,138 @@ public class TeamDataFragment extends TeamFragment {
         } catch (JSONException e) {
         }
 
-        TextView sclLb = new TextView(getContext());
-        sclLb.setText("Scale/g");
-        gridLayout.addView(sclLb);
+        linearLayout = new LinearLayout(getContext());
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
 
-        TextView schlLb = new TextView(getContext());
-        schlLb.setText("Switch/g");
-        gridLayout.addView(schlLb);
+        LinearLayout buttonRow = new TeamButtons(getContext(), this);
+        linearLayout.addView(buttonRow);
 
-        TextView exchlb = new TextView(getContext());
-        exchlb.setText("Exchange/g");
-        gridLayout.addView(exchlb);
+        tableLayout = new TableLayout(getContext());
+        tableLayout.setStretchAllColumns(true);
 
-        TextView climbLb = new TextView(getContext());
-        climbLb.setText("% Climb");
-        gridLayout.addView(climbLb);
+        TableRow labels1 = new TableRow(getContext());
 
-        TextView scaleVal = new TextView(getContext());
+        TextView scaleLabel = new TextView(getContext());
+        scaleLabel.setText("Scale Cubes/Game");
+        labels1.addView(scaleLabel);
+
+        TextView switchLabel = new TextView(getContext());
+        switchLabel.setText("Switch Cubes/Game");
+        labels1.addView(switchLabel);
+
+        TextView exchangeLabel = new TextView(getContext());
+        exchangeLabel.setText("Exchange Cubes/Game");
+        labels1.addView(exchangeLabel);
+
+        TextView climbLabel = new TextView(getContext());
+        climbLabel.setText("Succesful Climb %");
+        labels1.addView(climbLabel);
+
+        tableLayout.addView(labels1);
+
+
+        TableRow values1 = new TableRow(getContext());
+
+        TextView scaleValue = new TextView(getContext());
         try {
-            scaleVal.setText(teamInfo.getDouble("scale") + "");
+            scaleValue.setText(teamInfo.getDouble("scale") + "");
         } catch (JSONException e) {
-            scaleVal.setText("0");
+            scaleValue.setText("0");
         }
-        gridLayout.addView(scaleVal);
+        values1.addView(scaleValue);
 
-        TextView switchVal = new TextView(getContext());
+        TextView switchValue = new TextView(getContext());
         try {
-            switchVal.setText(teamInfo.getDouble("switch") + "");
+            switchValue.setText(teamInfo.getDouble("switch") + "");
         } catch (JSONException e) {
-            switchVal.setText("0");
+            switchValue.setText("0");
         }
-        gridLayout.addView(switchVal);
+        values1.addView(switchValue);
 
-        TextView exchangeVal = new TextView(getContext());
+        TextView exchangeValue = new TextView(getContext());
         try {
-            exchangeVal.setText(teamInfo.getDouble("exchange") + "");
+            exchangeValue.setText(teamInfo.getDouble("exchange") + "");
         } catch (JSONException e) {
-            exchangeVal.setText("0");
+            exchangeValue.setText("0");
         }
-        gridLayout.addView(exchangeVal);
+        values1.addView(exchangeValue);
 
-        TextView climbVal = new TextView(getContext());
+        TextView climbValue = new TextView(getContext());
         try {
-            climbVal.setText(teamInfo.getDouble("climb")*100 + "%");
+            climbValue.setText(teamInfo.getDouble("climb") * 100 + "%");
         } catch (JSONException e) {
-            climbVal.setText("0%");
+            climbValue.setText("0%");
         }
-        gridLayout.addView(climbVal);
+        values1.addView(climbValue);
 
-        TextView playLb = new TextView(getContext());
-        playLb.setText("# Played");
-        gridLayout.addView(playLb);
+        tableLayout.addView(values1);
 
-        TextView crossLb = new TextView(getContext());
-        crossLb.setText("% Cross");
-        gridLayout.addView(crossLb);
 
-        TextView correctLb = new TextView(getContext());
-        correctLb.setText("% Correct");
-        gridLayout.addView(correctLb);
+        Space space = new Space(getContext());
+        space.setMinimumHeight(50);
+        tableLayout.addView(space);
 
-        gridLayout.addView(new Space(getContext()));
 
-        gridLayout.addView(new Space(getContext()));
+        TableRow labels2 = new TableRow(getContext());
 
-        TextView playVal = new TextView(getContext());
+        TextView gamesLabel = new TextView(getContext());
+        gamesLabel.setText("Matches Played");
+        labels2.addView(gamesLabel);
+
+        TextView autoCrossLabel = new TextView(getContext());
+        autoCrossLabel.setText("Auto Line Cross %");
+        labels2.addView(autoCrossLabel);
+
+        TextView autoSwitchLabel = new TextView(getContext());
+        autoSwitchLabel.setText("Auto Switch %");
+        labels2.addView(autoSwitchLabel);
+
+        TextView autoScaleLabel = new TextView(getContext());
+        autoScaleLabel.setText("Auto Scale %");
+        labels2.addView(autoScaleLabel);
+
+        tableLayout.addView(labels2);
+
+
+        TableRow values2 = new TableRow(getContext());
+
+        TextView playValue = new TextView(getContext());
         try {
-            playVal.setText(teamInfo.getInt("played") + "");
+            playValue.setText(teamInfo.getInt("played") + "");
         } catch (JSONException e) {
-            playVal.setText("0");
+            playValue.setText("0");
         }
-        gridLayout.addView(playVal);
+        values2.addView(playValue);
 
-        TextView crossVal = new TextView(getContext());
+        TextView crossValue = new TextView(getContext());
         try {
-            crossVal.setText(teamInfo.getDouble("cross")*100 + "%");
+            crossValue.setText(teamInfo.getDouble("cross") * 100 + "%");
         } catch (JSONException e) {
-            crossVal.setText("0%");
+            crossValue.setText("0%");
         }
-        gridLayout.addView(crossVal);
+        values2.addView(crossValue);
 
-        TextView correctVal = new TextView(getContext());
+        TextView autoSwitchValue = new TextView(getContext());
         try {
-            correctVal.setText(teamInfo.getDouble("autoSwitch") + "%");
+            autoSwitchValue.setText(teamInfo.getDouble("autoSwitch") + "%");
         } catch (JSONException e) {
-            correctVal.setText("0%");
+            autoSwitchValue.setText("0%");
         }
-        gridLayout.addView(correctVal);
+        values2.addView(autoSwitchValue);
 
-        linearLayout.addView(gridLayout);
+        TextView autoScaleValue = new TextView(getContext());
+        try {
+            autoScaleValue.setText(teamInfo.getDouble("autoScale") + "%");
+        } catch (JSONException e) {
+            autoScaleValue.setText("0%");
+        }
+        values2.addView(autoScaleValue);
+
+
+        tableLayout.addView(values2);
+
+
+        linearLayout.addView(tableLayout);
         return linearLayout;
     }
 }

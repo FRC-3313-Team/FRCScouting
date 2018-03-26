@@ -2,6 +2,9 @@ package com.team3313.frcscouting.fragments;
 
 import android.support.v4.app.Fragment;
 
+import com.team3313.frcscouting.DataStore;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -23,5 +26,14 @@ public class ScoutingFragment extends Fragment {
         ScoutingFragment fragment = new ScoutingFragment();
         fragment.data = start;
         return fragment;
+    }
+
+    public void saveData() {
+        try {
+            data.put("updated", true);
+            DataStore.matchData.put(data.getString("match_key"), data.getString("team_key"), data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

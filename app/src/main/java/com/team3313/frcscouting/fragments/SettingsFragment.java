@@ -93,7 +93,7 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
         TableRow refreshRow = new TableRow(getContext());
 
         Button refreshButton = new Button(getActivity());
-        refreshButton.setText("Refresh data");
+        refreshButton.setText("Synchronize data");
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

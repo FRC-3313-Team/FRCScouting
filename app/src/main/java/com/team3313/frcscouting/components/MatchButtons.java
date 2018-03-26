@@ -97,8 +97,8 @@ public class MatchButtons extends LinearLayout {
                     } catch (JSONException e) {
                     }
                 }
-
                 try {
+                    fragment.data.put("updated", true);
                     DataStore.matchData.put(fragment.data.getString("match_key"), fragment.data.getString("team_key"), fragment.data);
                 } catch (JSONException e) {
                     e.printStackTrace();

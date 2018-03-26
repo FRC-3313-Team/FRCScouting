@@ -59,7 +59,7 @@ public class DataStore {
                                 }
                             }
                         };
-                        team.execute("Authentication:yT^#N*X#I&XNFfin3 fGISfmeygfai8mfgm6i*64m8I6GMO863I8");
+                        team.execute("Authentication:" + config.getString("apiKey"));
                     }
                     writeToFile(teamData.toString(), "teams.json");
                 } catch (JSONException e) {
@@ -94,6 +94,7 @@ public class DataStore {
                     JSONObject item = null;
                     try {
                         item = r.getJSONObject(i);
+                        item.remove("_id");
                         matchData.put(item.getString("match_key"), item.getString("team_key"), item);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -135,7 +136,7 @@ public class DataStore {
                 e.printStackTrace();
             }
         } else {
-            getTeamGetter().execute("X-TBA-Auth-Key:IdxoRao9PllsmPXPcOq9lcNU3o3zQAN6Tg3gflC9VCw1Wvj4pfqzV1Gmfiks0T9o");
+            getTeamGetter().execute();
         }
         String matchString = readFromFile("match-data.json");
         if (!Objects.equals(matchString, "")) {
@@ -157,7 +158,7 @@ public class DataStore {
 
         getScheduleGetter().execute();
 
-        getTeamGetter().execute("X-TBA-Auth-Key:IdxoRao9PllsmPXPcOq9lcNU3o3zQAN6Tg3gflC9VCw1Wvj4pfqzV1Gmfiks0T9o");
+        getTeamGetter().execute();
 
         getMatchDataGetter().execute();
     }
@@ -288,9 +289,10 @@ public class DataStore {
                             if (!r.startsWith("fail")) {
                                 item.remove("updated");
                             }
+                            System.out.println(r);
                         }
                     };
-                    t.execute("Authentication:yT^#N*X#I&XNFfin3 fGISfmeygfai8mfgm6i*64m8I6GMO863I8");
+                    t.execute("Authentication:" + config.getString("apiKey"));
                 }
             } catch (JSONException e) {
                 //item is missing the 'updated' tag
@@ -349,13 +351,13 @@ public class DataStore {
                     exchange += tele.getInt("exchange");
                 }
             }
+            teamObject.put("played", played);
             if (played == 0) {
-                played = 1;
+                played = 1;// this is for /0 errors
             }
             teamObject.put("scale", scale / played);
             teamObject.put("switch", swth / played);
             teamObject.put("exchange", exchange / played);
-            teamObject.put("played", played);
 
 
             teamObject.put("climb", climb / played);

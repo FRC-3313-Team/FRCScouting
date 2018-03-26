@@ -96,6 +96,13 @@ public class RESTGetter {
                 URL url = new URL(urlString);
 
                 HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+
+                for (String param : params) {
+                    String[] split = param.split(":");
+                    if (split.length == 2) {
+                        urlConnection.setRequestProperty(split[0], split[1]);
+                    }
+                }
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setDoOutput(true);
                 urlConnection.setDoInput(true);
@@ -114,9 +121,9 @@ public class RESTGetter {
                 urlConnection.connect();
 
 
-                String ret = urlConnection.getResponseCode() + " " + readStream(urlConnection.getInputStream());
-
-                if (urlConnection.getResponseCode() == 201) {
+                //String ret = urlConnection.getResponseCode() + " " + readStream(urlConnection.getInputStream());
+                String ret = "";
+                if (urlConnection.getResponseCode() == 201 || urlConnection.getResponseCode() == 200) {
                     ret = "pass: " + readStream(urlConnection.getInputStream());
                 } else if (urlConnection.getResponseCode() == 209) {
                     ret = "fail: " + urlConnection.getResponseMessage();

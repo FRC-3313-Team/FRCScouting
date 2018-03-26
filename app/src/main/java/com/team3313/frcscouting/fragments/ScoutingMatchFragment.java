@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.Space;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -34,9 +35,9 @@ public class ScoutingMatchFragment extends ScoutingFragment {
     public NumberPicker exchangePicker;
     public CheckBox teleClimbBox;
     LinearLayout linearLayout;
+    LinearLayout buttonRow;
     LinearLayout matchSep;
-    TableLayout autoLayout;
-    TableLayout teleLayout;
+    TableLayout tableHolder;
     // TODO: Rename and change types of parameters
 
     /**
@@ -64,7 +65,6 @@ public class ScoutingMatchFragment extends ScoutingFragment {
         linearLayout = new LinearLayout(getActivity());
         linearLayout.setOrientation(LinearLayout.VERTICAL);
 
-
         TableRow.LayoutParams pickParam = new TableRow.LayoutParams();
         pickParam.width = TableRow.LayoutParams.WRAP_CONTENT;
         pickParam.height = TableRow.LayoutParams.WRAP_CONTENT;
@@ -75,120 +75,127 @@ public class ScoutingMatchFragment extends ScoutingFragment {
         matchSep = new LinearLayout(getContext());
         matchSep.setOrientation(LinearLayout.HORIZONTAL);
 
-        LinearLayout buttonRow = new MatchButtons(getContext(), this);
+        buttonRow = new MatchButtons(getContext(), this);
         linearLayout.addView(buttonRow);
 
-        autoLayout = new TableLayout(getContext());
+        tableHolder = new TableLayout(getContext());
+        tableHolder.setColumnStretchable(2, true);
+        tableHolder.setColumnStretchable(5, true);
 
-        TableRow autoLabelRow = new TableRow(getContext());
+
+        TableRow labelRow = new TableRow(getContext());
         TextView autoLabel = new TextView(getContext());
         autoLabel.setText("Autonomous");
         TableRow.LayoutParams params = new TableRow.LayoutParams();
         params.span = 2; //amount of columns you will span
         params.gravity = Gravity.CENTER_HORIZONTAL;
         autoLabel.setLayoutParams(params);
-        autoLabelRow.addView(autoLabel);
-        autoLayout.addView(autoLabelRow);
+        labelRow.addView(autoLabel);
 
-        TableRow autoSwitch = new TableRow(getContext());
+        labelRow.addView(new Space(getContext()));
+
+        TextView teleLabel = new TextView(getContext());
+        teleLabel.setText("Tele-Operated");
+        params = new TableRow.LayoutParams();
+        params.span = 2; //amount of columns you will span
+        params.gravity = Gravity.CENTER_HORIZONTAL;
+        teleLabel.setLayoutParams(params);
+        labelRow.addView(teleLabel);
+
+        labelRow.addView(new Space(getContext()));
+
+        tableHolder.addView(labelRow);
+
+        TableRow switchRow = new TableRow(getContext());
         TextView autoCubeLabel = new TextView(getContext());
         autoCubeLabel.setText("Cube in Switch");
-        autoSwitch.addView(autoCubeLabel);
+        switchRow.addView(autoCubeLabel);
+
         autoSwitchBox = new CheckBox(getContext());
         try {
             autoSwitchBox.setChecked(data.getJSONObject("auto").getBoolean("switch"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        autoSwitch.addView(autoSwitchBox);
-        autoLayout.addView(autoSwitch);
+        switchRow.addView(autoSwitchBox);
 
-        TableRow autoScale = new TableRow(getContext());
-        TextView autoScaleLabel = new TextView(getContext());
-        autoScaleLabel.setText("Cube in Scale");
-        autoScale.addView(autoScaleLabel);
-        autoScaleBox = new CheckBox(getContext());
-        try {
-            autoScaleBox.setChecked(data.getJSONObject("auto").getBoolean("scale"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        autoScale.addView(autoScaleBox);
-        autoLayout.addView(autoScale);
+        switchRow.addView(new Space(getContext()));
 
-        TableRow autoCross = new TableRow(getContext());
-        TextView autoCrossLabel = new TextView(getContext());
-        autoCrossLabel.setText("Crossed Auto Line");
-        autoCross.addView(autoCrossLabel);
-        autoCrossBox = new CheckBox(getContext());
-        try {
-            autoCrossBox.setChecked(data.getJSONObject("auto").getBoolean("passedLine"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        autoCross.addView(autoCrossBox);
-        autoLayout.addView(autoCross);
-
-        matchSep.addView(autoLayout);
-
-
-        teleLayout = new TableLayout(getContext());
-
-        TableRow teleRow = new TableRow(getContext());
-        TextView teleLabel = new TextView(getContext());
-        teleLabel.setText("Tele-Operated");
-        params = new TableRow.LayoutParams();
-        params.span = 4; //amount of columns you will span
-        params.gravity = Gravity.CENTER_HORIZONTAL;
-        teleLabel.setLayoutParams(params);
-        teleRow.addView(teleLabel);
-        teleLayout.addView(teleRow);
-
-        TableRow scaleCubes = new TableRow(getContext());
-        TextView scaleCubesLabel = new TextView(getContext());
-        scaleCubesLabel.setText("Cubes on Scale");
-        scaleCubesLabel.setLayoutParams(labelParam);
-        scaleCubes.addView(scaleCubesLabel);
-        scalePicker = new NumberPicker(getContext(), null);
-        try {
-            scalePicker.setValue(data.getJSONObject("tele").getInt("scale"));
-        } catch (JSONException e) {
-        }
-        scalePicker.setLayoutParams(pickParam);
-        scaleCubes.addView(scalePicker);
-        teleLayout.addView(scaleCubes);
-
-
-        TableRow switchCubes = new TableRow(getContext());
         TextView switchCubesLabel = new TextView(getContext());
         switchCubesLabel.setText("Cubes on Switch");
         switchCubesLabel.setLayoutParams(labelParam);
-        switchCubes.addView(switchCubesLabel);
+        switchRow.addView(switchCubesLabel);
         switchPicker = new NumberPicker(getContext(), null);
         try {
             switchPicker.setValue(data.getJSONObject("tele").getInt("switch"));
         } catch (JSONException e) {
         }
         switchPicker.setLayoutParams(pickParam);
-        switchCubes.addView(switchPicker);
-        teleLayout.addView(switchCubes);
+        switchRow.addView(switchPicker);
+
+        tableHolder.addView(switchRow);
+
+        TableRow scaleRow = new TableRow(getContext());
+        TextView autoScaleLabel = new TextView(getContext());
+        autoScaleLabel.setText("Cube in Scale");
+        scaleRow.addView(autoScaleLabel);
+        autoScaleBox = new CheckBox(getContext());
+        try {
+            autoScaleBox.setChecked(data.getJSONObject("auto").getBoolean("scale"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        scaleRow.addView(autoScaleBox);
+
+        scaleRow.addView(new Space(getContext()));
+
+        TextView scaleCubesLabel = new TextView(getContext());
+        scaleCubesLabel.setText("Cubes on Scale");
+        scaleCubesLabel.setLayoutParams(labelParam);
+        scaleRow.addView(scaleCubesLabel);
+        scalePicker = new NumberPicker(getContext(), null);
+        try {
+            scalePicker.setValue(data.getJSONObject("tele").getInt("scale"));
+        } catch (JSONException e) {
+        }
+        scalePicker.setLayoutParams(pickParam);
+        scaleRow.addView(scalePicker);
+
+        tableHolder.addView(scaleRow);
+
+        TableRow otherRow = new TableRow(getContext());
+        TextView autoCrossLabel = new TextView(getContext());
+        autoCrossLabel.setText("Crossed Auto Line");
+        otherRow.addView(autoCrossLabel);
+        autoCrossBox = new CheckBox(getContext());
+        try {
+            autoCrossBox.setChecked(data.getJSONObject("auto").getBoolean("passedLine"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        otherRow.addView(autoCrossBox);
+
+        otherRow.addView(new Space(getContext()));
 
 
-        TableRow exchangeCubes = new TableRow(getContext());
         TextView exchangeCubesLabel = new TextView(getContext());
         exchangeCubesLabel.setText("Cubes in Exchange");
         exchangeCubesLabel.setLayoutParams(labelParam);
-        exchangeCubes.addView(exchangeCubesLabel);
+        otherRow.addView(exchangeCubesLabel);
         exchangePicker = new NumberPicker(getContext(), null);
         try {
             exchangePicker.setValue(data.getJSONObject("tele").getInt("exchange"));
         } catch (JSONException e) {
         }
         exchangePicker.setLayoutParams(pickParam);
-        exchangeCubes.addView(exchangePicker);
-        teleLayout.addView(exchangeCubes);
+        otherRow.addView(exchangePicker);
+
+        tableHolder.addView(otherRow);
 
         TableRow teleClimb = new TableRow(getContext());
+        teleClimb.addView(new Space(getContext()));
+        teleClimb.addView(new Space(getContext()));
+        teleClimb.addView(new Space(getContext()));
         TextView teleClimbLabel = new TextView(getContext());
         teleClimbLabel.setText("Succesful Climb");
         teleClimb.addView(teleClimbLabel);
@@ -199,11 +206,9 @@ public class ScoutingMatchFragment extends ScoutingFragment {
             e.printStackTrace();
         }
         teleClimb.addView(teleClimbBox);
-        teleLayout.addView(teleClimb);
+        tableHolder.addView(teleClimb);
 
-
-        matchSep.addView(teleLayout);
-
+        matchSep.addView(tableHolder);
 
         linearLayout.addView(matchSep);
         return linearLayout;
