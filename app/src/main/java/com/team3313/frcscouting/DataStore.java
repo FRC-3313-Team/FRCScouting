@@ -155,6 +155,7 @@ public class DataStore {
 
     public static void manualRefresh() {
         uploadMatchData();
+        uploadPitData();
 
         getScheduleGetter().execute();
 
@@ -298,6 +299,40 @@ public class DataStore {
                 //item is missing the 'updated' tag
             }
         }
+    }
+
+    public static void uploadPitData() {
+        JSONArray names = teamData.names();
+        for (int i = 0; i < names.length(); i++) {
+            try {
+                if (teamData.getJSONObject(names.getString(i)).has("pit")) {
+                    final JSONObject pit = teamData.getJSONObject(names.getString(i)).getJSONObject("pit");
+
+                    System.out.println("found pit data for " + names.getString(i) + ":" + pit.names());
+                    if (pit.getBoolean("updated")) {
+                        JSONObject toUpload = new JSONObject(pit.toString());
+                        toUpload.remove("updated");
+                        System.out.println("Attempting upload:pit for " + names.getString(i));
+                        final RESTGetter.HttpsSubmitTask t = new RESTGetter.HttpsSubmitTask("https://team3313.com/scouting/pit/" + names.getString(i), toUpload.toString()) {
+
+                            @Override
+                            protected void customEnd(String r) {
+                                if (!r.startsWith("fail")) {
+                                    pit.remove("updated");
+                                }
+                                System.out.println(r);
+                            }
+                        };
+                        t.execute("Authentication:" + config.getString("apiKey"));
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+        System.out.println("Pit Data " + names);
     }
 
     public static void autoSave() {
