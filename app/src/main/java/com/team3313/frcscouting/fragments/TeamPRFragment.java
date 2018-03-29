@@ -4,17 +4,20 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.team3313.frcscouting.DataStore;
 import com.team3313.frcscouting.MainActivity;
+import com.team3313.frcscouting.R;
 import com.team3313.frcscouting.components.TeamButtons;
 
 import org.json.JSONArray;
@@ -35,6 +38,7 @@ public class TeamPRFragment extends TeamFragment {
     public CheckBox entrepreneurshipBox;
     public CheckBox deansBox;
     public ArrayList<TableRow> socialRows = new ArrayList();
+    public EditText outreach;
     LinearLayout linearLayout;
     LinearLayout prLayout;
     TableLayout awards;
@@ -152,6 +156,16 @@ public class TeamPRFragment extends TeamFragment {
         }
         safetyRow.addView(safetyBox);
         awards.addView(safetyRow);
+        outreach = new EditText(getContext());
+
+        try {
+            outreach.setText(teamData.getString("outreach"));
+        } catch (Exception ex) {
+            outreach.setText("Creative Outreach Info");
+        }
+        outreach.setMinimumWidth(500);
+        outreach.setMinLines(4);
+        awards.addView(outreach);
 
 
         prLayout.addView(awards);
@@ -167,15 +181,23 @@ public class TeamPRFragment extends TeamFragment {
             public void onClick(View v) {
 
                 TableRow row = new TableRow(getContext());
-                EditText site = new EditText(getContext());
-                row.addView(site);
+                Spinner spinner = new Spinner(getActivity());
+
+                // Create an ArrayAdapter using the string array and a default spinner layout
+                ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                        R.array.sites, android.R.layout.simple_spinner_item);
+                // Specify the layout to use when the list of choices appears
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                // Apply the adapter to the spinner.
+                spinner.setAdapter(adapter);
+                row.addView(spinner);
                 EditText handle = new EditText(getContext());
                 row.addView(handle);
                 socialRows.add(row);
                 social.addView(row);
             }
         });
-        prLayout.addView(addRow);
+        social.addView(addRow);
 
         TableRow header = new TableRow(getContext());
         TextView siteText = new TextView(getContext());
@@ -196,9 +218,17 @@ public class TeamPRFragment extends TeamFragment {
         for (int i = 0; i < socialData.length(); i++) {
             try {
                 TableRow row = new TableRow(getContext());
-                EditText site = new EditText(getContext());
-                site.setText(socialData.getJSONObject(i).getString("site"));
-                row.addView(site);
+                Spinner spinner = new Spinner(getActivity());
+
+                // Create an ArrayAdapter using the string array and a default spinner layout
+                ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                        R.array.sites, android.R.layout.simple_spinner_item);
+                // Specify the layout to use when the list of choices appears
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                // Apply the adapter to the spinner.
+                spinner.setAdapter(adapter);
+                spinner.setSelection(socialData.getJSONObject(i).getInt("site"));
+                row.addView(spinner);
                 EditText handle = new EditText(getContext());
                 handle.setText(socialData.getJSONObject(i).getString("handle"));
                 row.addView(handle);

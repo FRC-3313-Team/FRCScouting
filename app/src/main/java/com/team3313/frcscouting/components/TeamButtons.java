@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TableRow;
 
 import com.team3313.frcscouting.DataStore;
@@ -15,6 +16,7 @@ import com.team3313.frcscouting.fragments.TeamDataFragment;
 import com.team3313.frcscouting.fragments.TeamFragment;
 import com.team3313.frcscouting.fragments.TeamMatchesFragment;
 import com.team3313.frcscouting.fragments.TeamNotesFragment;
+import com.team3313.frcscouting.fragments.TeamPR2Fragment;
 import com.team3313.frcscouting.fragments.TeamPRFragment;
 
 import org.json.JSONArray;
@@ -84,6 +86,12 @@ public class TeamButtons extends LinearLayout {
                     TeamPRFragment frag = (TeamPRFragment) fragment;
                     try {
                         JSONObject pit = new JSONObject();
+
+                        try {
+                            pit = DataStore.teamData.getJSONObject(frag.teamKey).getJSONObject("pit");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                         JSONObject awards = new JSONObject();
                         awards.put("chairmans", frag.chairmansBox.isChecked());
                         awards.put("flowers", frag.flowersBox.isChecked());
@@ -93,16 +101,17 @@ public class TeamButtons extends LinearLayout {
                         pit.put("awards", awards);
                         JSONArray social = new JSONArray();
                         for (TableRow r : frag.socialRows) {
-                            EditText site = (EditText) r.getChildAt(0);
+                            Spinner site = (Spinner) r.getChildAt(0);
                             EditText handle = (EditText) r.getChildAt(1);
                             JSONObject row = new JSONObject();
-                            if (!site.getText().toString().equalsIgnoreCase("")) {
-                                row.put("site", site.getText());
+                            if (!site.getSelectedItem().toString().equalsIgnoreCase("")) {
+                                row.put("site", site.getSelectedItemPosition());
                                 row.put("handle", handle.getText());
                                 social.put(row);
                             }
                         }
                         pit.put("social", social);
+                        pit.put("outreach", frag.outreach.getText());
                         pit.put("updated", true);
                         DataStore.teamData.getJSONObject(frag.teamKey).put("pit", pit);
                         System.out.println("Saving award data");
@@ -123,5 +132,53 @@ public class TeamButtons extends LinearLayout {
             });
         }
         addView(prButton);
+
+
+        Button pr2Button = new Button(getContext());
+        pr2Button.setText("Robot Strategy");
+        if (fragment instanceof TeamPR2Fragment) {
+            pr2Button.setEnabled(false);
+            Button saveButton = new Button(getContext());
+            saveButton.setText("Save PR2 Data");
+            saveButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TeamPR2Fragment frag = (TeamPR2Fragment) fragment;
+                    try {
+                        JSONObject pit = new JSONObject();
+                        try {
+                            pit = DataStore.teamData.getJSONObject(frag.teamKey).getJSONObject("pit");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        JSONObject strategy = new JSONObject();
+
+                        strategy.put("auton", frag.auton.getText());
+                        strategy.put("climb", frag.climbing.getText());
+                        strategy.put("intake", frag.cubeIntake.getText());
+                        strategy.put("score", frag.cubeScore.getText());
+                        strategy.put("strategy", frag.gameStrategy.getText());
+
+                        pit.put("2018game", strategy);
+                        pit.put("updated", true);
+                        DataStore.teamData.getJSONObject(frag.teamKey).put("pit", pit);
+                        System.out.println("Saving pit data");
+                        DataStore.uploadPitData();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            addView(saveButton);
+        } else {
+            pr2Button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FragmentManager fragmentManager = MainActivity.instance.getSupportFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.content_frame, TeamPR2Fragment.newInstance(fragment.teamKey)).commit();
+                }
+            });
+        }
+        addView(pr2Button);
     }
 }

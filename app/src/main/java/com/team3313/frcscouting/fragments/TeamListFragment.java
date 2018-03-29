@@ -28,7 +28,7 @@ import java.util.Random;
 
 
 public class TeamListFragment extends Fragment {
-    private final static int COLUMNS = 5;
+    private final static int COLUMNS = 6;
     LinearLayout topLayout;
     View.OnClickListener teamClick;
 

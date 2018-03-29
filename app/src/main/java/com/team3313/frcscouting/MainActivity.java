@@ -248,9 +248,9 @@ public class MainActivity extends AppCompatActivity {
 
     public String getActiveRegional(boolean humanReadable) {
         if (humanReadable) {
-            return "Great Northern 2018";
+            return "Minnesota North Star 2018";
         } else {
-            return "2018ndgf";
+            return "2018mnmi2";
         }
     }
 

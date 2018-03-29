@@ -154,8 +154,14 @@ public class DataStore {
     }
 
     public static void manualRefresh() {
-        uploadMatchData();
-        uploadPitData();
+        try {
+            uploadMatchData();
+        } catch (Exception ex) {
+        }
+        try {
+            uploadPitData();
+        } catch (Exception ex) {
+        }
 
         getScheduleGetter().execute();
 
