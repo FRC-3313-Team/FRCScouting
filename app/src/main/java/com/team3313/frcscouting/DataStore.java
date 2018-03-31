@@ -1,6 +1,7 @@
 package com.team3313.frcscouting;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -32,8 +33,8 @@ public class DataStore {
      * Match key, team key, match object
      */
     public static Table<String, String, JSONObject> matchData = HashBasedTable.create();
-    public static JSONArray scheduleData;
-    public static JSONObject config;
+    public static JSONArray scheduleData = new JSONArray();
+    public static JSONObject config = new JSONObject();
     public static JSONObject teamData = new JSONObject();
 
     private static RESTGetter.HttpsRequestTaskArray getTeamGetter() {
@@ -154,20 +155,76 @@ public class DataStore {
     }
 
     public static void manualRefresh() {
-        try {
-            uploadMatchData();
-        } catch (Exception ex) {
-        }
+
+        new AsyncTask<String, Void, Void>() {
+            @Override
+            protected Void doInBackground(String... strings) {
+                try {
+                    uploadMatchData();
+                } catch (Exception ex) {
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void v) {
+                new AsyncTask<String, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(String... strings) {
+                        try {
+                            uploadPitData();
+                        } catch (Exception ex) {
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void v) {
+                        new AsyncTask<String, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(String... strings) {
+                                getScheduleGetter().execute();
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void v) {
+
+                                new AsyncTask<String, Void, Void>() {
+                                    @Override
+                                    protected Void doInBackground(String... strings) {
+                                        getTeamGetter().execute();
+                                        return null;
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Void v) {
+
+                                        new AsyncTask<String, Void, Void>() {
+                                            @Override
+                                            protected Void doInBackground(String... strings) {
+                                                getScheduleGetter().execute();
+                                                return null;
+                                            }
+
+                                            @Override
+                                            protected void onPostExecute(Void v) {
+                                                getMatchDataGetter().execute();
+                                            }
+                                        }.execute();
+                                    }
+                                }.execute();
+                            }
+                        }.execute();
+                    }
+                }.execute();
+            }
+
+        }.execute();
         try {
             uploadPitData();
         } catch (Exception ex) {
         }
-
-        getScheduleGetter().execute();
-
-        getTeamGetter().execute();
-
-        getMatchDataGetter().execute();
     }
 
     private static void writeToFile(String data, String filename) {
@@ -318,7 +375,7 @@ public class DataStore {
                     if (pit.getBoolean("updated")) {
                         JSONObject toUpload = new JSONObject(pit.toString());
                         toUpload.remove("updated");
-                        System.out.println("Attempting upload:pit for " + names.getString(i));
+                        System.out.println("Attempting upload: pit for " + names.getString(i));
                         final RESTGetter.HttpsSubmitTask t = new RESTGetter.HttpsSubmitTask("https://team3313.com/scouting/pit/" + names.getString(i), toUpload.toString()) {
 
                             @Override
@@ -333,6 +390,11 @@ public class DataStore {
                     }
                 }
             } catch (JSONException e) {
+                try {
+                    System.out.print(names.getString(i));
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
                 e.printStackTrace();
             }
 
@@ -343,7 +405,10 @@ public class DataStore {
 
     public static void autoSave() {
         System.out.println("Autosaving");
-        writeToFile(scheduleData.toString(), "regional-matches.json");
+        try {
+            writeToFile(scheduleData.toString(), "regional-matches.json");
+        } catch (Exception ex) {
+        }
         saveConfig();
         writeToFile(teamData.toString(), "teams.json");
         JSONArray saveMatches = new JSONArray();

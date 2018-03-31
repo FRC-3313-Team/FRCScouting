@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.team3313.frcscouting.DataStore;
 import com.team3313.frcscouting.MainActivity;
 import com.team3313.frcscouting.R;
+import com.team3313.frcscouting.components.TextViewExtra;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,6 +54,15 @@ public class TeamListFragment extends Fragment {
         for (int i = 0; i < COLUMNS; i++) {
             tableLayout.setColumnStretchable(i, true);
         }
+
+        TableRow header = new TableRow(getContext());
+        header.addView(new TextViewExtra(getContext(), "Red 1", null));
+        header.addView(new TextViewExtra(getContext(), "Red 2", null));
+        header.addView(new TextViewExtra(getContext(), "Red 3", null));
+        header.addView(new TextViewExtra(getContext(), "Blue 1", null));
+        header.addView(new TextViewExtra(getContext(), "Blue 2", null));
+        header.addView(new TextViewExtra(getContext(), "Blue 3", null));
+tableLayout.addView(header);
         for (int i = 0; i < r + 1; i++) {
             TableRow row = new TableRow(getContext());
 

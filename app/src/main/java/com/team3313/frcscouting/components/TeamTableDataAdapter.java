@@ -69,12 +69,13 @@ public class TeamTableDataAdapter extends TableDataAdapter<JSONObject> {
     }
 
     public static double getOverallScore(JSONObject team) throws JSONException {
-        return 10.87 * team.getDouble("scale")
+        return 0
+                + 200 * team.getDouble("autoScale")
                 + 75 * team.getDouble("climb")
+                + 23 * team.getDouble("autoSwitch")
+                + 10.87 * team.getDouble("scale")
                 + 9.82 * team.getDouble("exchange")
                 + 5.6 * team.getDouble("switch")
-                + 200 * team.getDouble("autoScale")
-                + 23 * team.getDouble("autoSwitch")
                 + 5.4 * team.getDouble("cross");
     }
 
